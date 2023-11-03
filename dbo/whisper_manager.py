@@ -28,7 +28,7 @@ async def generate_whisper(whisper_content: str, ttl: str, master_key: bytes):
 
     # Generate two SHA256 hashes for the URL
     hash1 = hashlib.sha256(encrypted_whisper_content).hexdigest()
-    hash2 = hashlib.sha256(nonce + whisper_content.encode() + ttl.encode()).hexdigest()
+    hash2 = hashlib.sha256(nonce + encrypted_whisper_content + ttl.encode()).hexdigest()
 
     # Return the link to the whisper
     link = f"/{hash1}/{hash2}"
