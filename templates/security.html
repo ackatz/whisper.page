@@ -20,9 +20,10 @@ block content %}
           <strong>Storage:</strong> Each Whisper Page's content is encrypted
           with a unique key using ChaCha20Poly1305 and then stored in a SQLite
           database. This database is encrypted at rest using Linux LUKS block
-          storage encryption secrets. The unique key is then encrypted by a
-          master key using ChaCha20Poly1305. The encrypted unique key is stored
-          with the encrypted content while the master key is stored separately.
+          storage encryption secrets. The unique key and link are then encrypted
+          by a master key using ChaCha20Poly1305. The encrypted unique key and
+          link stored with the encrypted content while the master key is stored
+          separately.
         </li>
         <li class="mb-2">
           <strong>Secure transmission:</strong> Your communication to Whisper
