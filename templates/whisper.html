@@ -51,8 +51,9 @@
   });
 
   function copyToClipboard() {
+    const markdown = document.getElementById("rawMarkdown").value;
     const el = document.createElement("textarea");
-    el.value = document.getElementById("markdownPreview").innerText;
+    el.value = markdown;
     document.body.appendChild(el);
     el.select();
     document.execCommand("copy");
