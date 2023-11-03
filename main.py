@@ -11,6 +11,7 @@ from dbo.whisper_manager import (
 from functions import date_functions
 import os
 import base64
+import re
 
 
 app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
@@ -20,6 +21,7 @@ app.mount("/app/static", StaticFiles(directory="/app/static"), name="static")
 
 master_key_str = os.environ.get("MASTER_KEY")
 master_key = base64.b64decode(master_key_str)
+sha256_pattern = re.compile(r"^[a-f0-9]{64}$")
 
 
 @app.middleware("http")
@@ -121,6 +123,12 @@ async def page_generate_link(
 
 @app.get("/{hash1}/{hash2}/")
 async def page_retrieve_whisper(request: Request, hash1: str, hash2: str):
+    if not (re.match(sha256_pattern, hash1) and re.match(sha256_pattern, hash2)):
+        raise HTTPException(
+            status_code=404,
+            detail="This whisper has already been destroyed or does not exist",
+        )
+
     try:
         (
             decrypted_content,
