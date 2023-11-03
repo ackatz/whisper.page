@@ -149,7 +149,7 @@ async def page_retrieve_whisper(request: Request, hash1: str, hash2: str):
     }
 
     if destruct_upon_viewing == "1":
-        await destroy_whisper(hash1, hash2)
+        await destroy_whisper(hash1, hash2, master_key)
 
     return templates.TemplateResponse("whisper.html", context)
 
@@ -160,6 +160,6 @@ async def page_destroy_whisper(request: Request, hash1: str, hash2: str):
         "request": request,
     }
 
-    await destroy_whisper(hash1, hash2)
+    await destroy_whisper(hash1, hash2, master_key)
 
     return templates.TemplateResponse("destroyed.html", context)

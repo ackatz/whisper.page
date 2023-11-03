@@ -113,20 +113,31 @@ async def retrieve_whisper(hash1: str, hash2: str, master_key: bytes):
     raise Exception("Whisper not found or unable to decrypt")
 
 
-async def destroy_whisper(hash1: str, hash2: str):
+async def destroy_whisper(hash1: str, hash2: str, master_key: bytes):
     incoming_link = f"/{hash1}/{hash2}"
 
     with get_db_connection() as conn:
         cur = conn.cursor()
+        whispers = cur.execute("SELECT * FROM whispers").fetchall()
 
-        cur.execute("SELECT COUNT(*) FROM whispers WHERE link = ?", (incoming_link,))
-        if cur.fetchone()[0] == 0:
-            return False
+    for whisper in whispers:
+        encrypted_link = whisper["link"]
+        nonce = whisper["nonce"]
 
-        cur.execute("DELETE FROM whispers WHERE link = ?", (incoming_link,))
-        conn.commit()
+        try:
+            # Decrypt the link with the master key
+            master_chacha = ChaCha20Poly1305(master_key)
+            decrypted_link = master_chacha.decrypt(nonce, encrypted_link, None).decode()
 
-    return True
+            # Check if the decrypted link matches the incoming link
+            if decrypted_link == incoming_link:
+                cur.execute("DELETE FROM whispers WHERE link = ?", (encrypted_link,))
+                conn.commit()
+
+                return True
+
+        except Exception as e:
+            continue
 
 
 def scheduled_destroy():
