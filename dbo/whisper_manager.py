@@ -4,14 +4,13 @@ from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 from dbo.get_db_connection import get_db_connection
 from functions.date_functions import ttl_create_epoch
 import bleach
-import markdown
 
 
 async def generate_whisper(whisper_content: str, ttl: str, master_key: bytes):
     ttl_epoch = await ttl_create_epoch(ttl)
 
     # Sanitize the whisper_content
-    cleaned_whisper_content = bleach.clean(markdown.markdown(whisper_content))
+    cleaned_whisper_content = bleach.clean(whisper_content)
 
     # Generate a random 256-bit (32-byte) key
     whisper_key = os.urandom(32)
