@@ -26,13 +26,21 @@ master_key = base64.b64decode(master_key_str)
 async def custom_http_middleware(request: Request, call_next):
     response = await call_next(request)
 
-    # Add security headers
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers[
-        "Content-Security-Policy"
-    ] = "default-src 'self'; script-src 'self'; object-src 'none';"
+    csp_header = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.counter.dev; "
+        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+        "img-src 'self' https://whisper.page data:; "
+        "connect-src 'self' https://cdn.counter.dev; "
+        "font-src 'self' https://cdnjs.cloudflare.com; "
+        "frame-src 'none'; "
+        "base-uri 'none'; "
+        "form-action 'self'; "
+        "block-all-mixed-content; "
+        "upgrade-insecure-requests;"
+    )
+    response.headers["Content-Security-Policy"] = csp_header
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
     if response.status_code in (404, 405):
         return templates.TemplateResponse(
             "404.html", {"request": request}, status_code=404
