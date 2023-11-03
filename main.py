@@ -9,18 +9,13 @@ from dbo.whisper_manager import (
     generate_whisper,
 )
 from functions import date_functions
-import os
-import base64
 import re
 
 
 app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
 
-templates = Jinja2Templates(directory="/app/templates")
-app.mount("/app/static", StaticFiles(directory="/app/static"), name="static")
-
-master_key_str = os.environ.get("MASTER_KEY")
-master_key = base64.b64decode(master_key_str)
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 sha256_pattern = re.compile(r"^[a-f0-9]{64}$")
 
 
@@ -34,10 +29,10 @@ async def custom_http_middleware(request: Request, call_next):
     response.headers["Referrer-Policy"] = "no-referrer"
     csp_header = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.counter.dev; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.counter.dev;"
+        "connect-src 'self' https://cdn.jsdelivr.net https://cdn.counter.dev; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "img-src 'self' https://whisper.page data:; "
-        "connect-src 'self' https://cdn.counter.dev; "
         "font-src 'self' https://cdnjs.cloudflare.com; "
         "frame-src 'none'; "
         "base-uri 'none'; "
@@ -91,24 +86,24 @@ async def page_generate_link(
     destruct_upon_viewing: bool = Form(False),
 ):
     (
-        encrypted_whisper_key,
-        encrypted_whisper_content,
         link,
-        ttl,
+        hash1,
+        hash2,
+        encrypted_whisper_content,
+        ttl_epoch,
         nonce,
-        encrypted_link,
-    ) = await generate_whisper(whisper_content, ttl, master_key)
+    ) = await generate_whisper(whisper_content, ttl)
 
     await store_whisper(
-        encrypted_link,
-        encrypted_whisper_key,
+        hash1,
+        hash2,
         encrypted_whisper_content,
-        ttl,
+        ttl_epoch,
         destruct_upon_viewing,
         nonce,
     )
 
-    ttl_date = await date_functions.ttl_date_parser(ttl)
+    ttl_date = await date_functions.ttl_date_parser(ttl_epoch)
     ttl_minutes = date_functions.minutes_until_expiry(ttl_date)
 
     context = {
@@ -121,7 +116,7 @@ async def page_generate_link(
     return templates.TemplateResponse("link.html", context)
 
 
-@app.get("/{hash1}/{hash2}/")
+@app.get("/{hash1}/{hash2}")
 async def page_retrieve_whisper(request: Request, hash1: str, hash2: str):
     if not (re.match(sha256_pattern, hash1) and re.match(sha256_pattern, hash2)):
         raise HTTPException(
@@ -131,10 +126,11 @@ async def page_retrieve_whisper(request: Request, hash1: str, hash2: str):
 
     try:
         (
-            decrypted_content,
+            encrypted_whisper_content,
             ttl,
             destruct_upon_viewing,
-        ) = await retrieve_whisper(hash1, hash2, master_key)
+            nonce,
+        ) = await retrieve_whisper(hash1, hash2)
 
     except:
         raise HTTPException(
@@ -145,11 +141,12 @@ async def page_retrieve_whisper(request: Request, hash1: str, hash2: str):
     ttl_date = await date_functions.ttl_date_parser(ttl)
     ttl_minutes = date_functions.minutes_until_expiry(ttl_date)
 
-    incoming_link = "/" + hash1 + "/" + hash2
+    incoming_link = "/" + hash1 + "/" + hash2 + "/"
 
     context = {
         "request": request,
-        "whisper_content": decrypted_content,
+        "whisper_content": encrypted_whisper_content,
+        "nonce": nonce,
         "destruct_upon_viewing": destruct_upon_viewing,
         "ttl_date": ttl_date,
         "ttl_minutes": ttl_minutes,
@@ -157,7 +154,7 @@ async def page_retrieve_whisper(request: Request, hash1: str, hash2: str):
     }
 
     if destruct_upon_viewing == "1":
-        await destroy_whisper(hash1, hash2, master_key)
+        await destroy_whisper(hash1, hash2)
 
     return templates.TemplateResponse("whisper.html", context)
 
@@ -167,7 +164,5 @@ async def page_destroy_whisper(request: Request, hash1: str, hash2: str):
     context = {
         "request": request,
     }
-
-    await destroy_whisper(hash1, hash2, master_key)
-
+    await destroy_whisper(hash1, hash2)
     return templates.TemplateResponse("destroyed.html", context)

@@ -27,10 +27,10 @@ page_title %} {% block content %}
     <div class="container mx-auto mt-6 text-center mb-6">
       <p class="text-neutral-900 mb-6">
         This Whisper Page will automatically expire on:<br />
-        <span class="text-blue-900 font-semibold"
-          >{{ ttl_date }} UTC {% if ttl_minutes < 60 %} ({{ ttl_minutes }}
-          minutes from now) {% else %} ({{ (ttl_minutes / 60)|round }} hours
-          from now) {% endif %}
+        <span class="text-blue-900 font-semibold">
+          {{ ttl_date }} UTC {% if ttl_minutes < 60 %} ({{ ttl_minutes }}
+          minutes from now) {% else %} ({{ ttl_minutes // 60 + (ttl_minutes % 60
+          > 0) }} hours from now) {% endif %}
         </span>
       </p>
     </div>
@@ -44,7 +44,7 @@ page_title %} {% block content %}
   <script>
     function copyToClipboard() {
       const el = document.createElement("textarea");
-      el.value = "https://whisper.page{{ link }}/";
+      el.value = "https://whisper.page{{ link }}";
       document.body.appendChild(el);
       el.select();
       document.execCommand("copy");

@@ -3,6 +3,7 @@ import pendulum
 
 async def ttl_date_parser(ttl_epoch):
     datetime_obj = pendulum.from_timestamp(ttl_epoch)
+
     return datetime_obj
 
 
@@ -17,6 +18,6 @@ def minutes_until_expiry(ttl_datetime):
 
 async def ttl_create_epoch(ttl):
     current_epoch = pendulum.now("UTC").timestamp()
-    # Add the TTL to the current epoch time
     ttl_epoch = current_epoch + (int(ttl) * 60)
+
     return int(ttl_epoch)

@@ -20,10 +20,14 @@ block content %}
           <strong>Storage:</strong> Each Whisper Page's content is encrypted
           with a unique key using ChaCha20Poly1305 and then stored in a SQLite
           database. This database is encrypted at rest using Linux LUKS block
-          storage encryption secrets. The unique key and link are then encrypted
-          by a master key using ChaCha20Poly1305. The encrypted unique key and
-          link are stored with the encrypted content while the master key is
-          stored separately.
+          storage encryption secrets.
+        </li>
+        <li class="mb-2">
+          <strong>Client-side decryption:</strong> We never store the key used
+          to encrypt your Whisper Page's content. The key is tacked onto the
+          unique URL for your Whisper Page and is only known by you and anyone
+          you share it with. When you visit a Whisper Page, the key is extracted
+          from the URL and used to decrypt the content.
         </li>
         <li class="mb-2">
           <strong>Secure transmission:</strong> Your communication to Whisper
@@ -38,7 +42,8 @@ block content %}
           <strong>SHA-256 Hash Links:</strong> When a Whisper Page is created,
           two SHA-256 hashes are generated to serve as the path for the Whisper
           Page. This makes it incredibly difficult for someone to try to
-          enumerate through potential paths.
+          enumerate through potential paths. Even if they were able to guess a
+          path, they would still need the key to decrypt the content.
         </li>
         <li class="mb-2">
           <strong>No-Log Policy:</strong> We do not store logs of your
