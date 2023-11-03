@@ -14,8 +14,8 @@ import re
 
 app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
 
-templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="/app/templates")
+app.mount("/app/static", StaticFiles(directory="/app/static"), name="static")
 sha256_pattern = re.compile(r"^[a-f0-9]{64}$")
 
 
