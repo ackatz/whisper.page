@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% block head %}
+<script
+  src="https://cdn.counter.dev/script.js"
+  data-id="bb924a97-31a1-4dfb-8076-3b1073b0ce8d"
+  data-utcoffset="-7"
+></script>
+{% endblock head %} {% block title %}<title>Whisper.Page | Security</title>{%
+endblock title %} {% block page_title %}Security{% endblock page_title %} {%
+block content %}
+<div class="container mx-auto px-4">
+  <!-- Security Container -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-2">
+    <div class="mb-6">
+      <p class="text-neutral-700">
+        When you create a Whisper Page, we implement the following security
+        measures to ensure your privacy and protect your data:
+      </p>
+      <ul class="list-disc mt-4">
+        <li class="mb-2">
+          <strong>Storage:</strong> Each Whisper Page's content is encrypted
+          with a unique key using ChaCha20Poly1305 and then stored in a SQLite
+          database. This database is encrypted at rest using Linux LUKS block
+          storage encryption secrets. The unique key is then encrypted by a
+          master key using ChaCha20Poly1305. The encrypted unique key is stored
+          with the encrypted content while the master key is stored separately.
+        </li>
+        <li class="mb-2">
+          <strong>Secure transmission:</strong> Your communication to Whisper
+          Pages is encrypted in transit using QUIC (HTTP/3).
+        </li>
+        <li class="mb-2">
+          <strong>Self-Destruction:</strong> Whisper Pages are deleted after a
+          period set by the user. Users also have the option to automatically
+          delete a Whisper Page once it has been viewed.
+        </li>
+        <li class="mb-2">
+          <strong>SHA-256 Hash Links:</strong> When a Whisper Page is created,
+          two SHA-256 hashes are generated to serve as the path for the Whisper
+          Page. This makes it incredibly difficult for someone to try to
+          enumerate through potential paths.
+        </li>
+        <li class="mb-2">
+          <strong>No-Log Policy:</strong> We do not store logs of your
+          communications. Once a whisper expires, it is permanently deleted from
+          the database.
+        </li>
+        <li class="mb-2">
+          <strong>User Anonymity:</strong> Whisper.Page doesn't require any
+          personal information to use our service. However, we do collect page
+          view data on pages that are not Whisper Pages using Counter.dev to
+          understand how our service is being used.
+        </li>
+      </ul>
+      <p class="text-neutral-700 mt-4">
+        If you have any questions or concerns about our security measures,
+        please don't hesitate to
+        <a
+          href="/contact"
+          class="font-normal text-neutral-700 hover:text-neutral-900 underline"
+          >contact us</a
+        >
+        or
+        <a
+          href="https://github.com/ackatz/whisper.page"
+          class="font-normal text-neutral-700 hover:text-neutral-900 underline"
+          >view the source code for yourself</a
+        >.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock content %}

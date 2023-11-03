@@ -1,0 +1,90 @@
+{% extends "base.html" %} {% block head %}
+<meta name="robots" content="noindex, nofollow" />
+{% endblock head %} {% block title %}
+<title>Whisper.Page | Viewing Whisper</title>
+{% endblock title %} {% block page_title %} {% endblock page_title %} {% block
+content %} {% if destruct_upon_viewing == "0" %} {% if ttl_date %}
+<div class="container mx-auto mt-6 text-center mb-6">
+  <p class="text-neutral-700 mb-6">
+    This Whisper Page will automatically expire on:<br />
+    <span class="text-blue-900 font-semibold">
+      {{ ttl_date }} UTC {% if ttl_minutes < 60 %} ({{ ttl_minutes }} minutes
+      from now) {% else %} ({{ (ttl_minutes / 60)|round }} hours from now) {%
+      endif %}
+    </span>
+  </p>
+</div>
+{% endif %} {% else %}
+
+<div class="container mx-auto mt-6 text-center mb-6">
+  <p class="text-neutral-700 mb-6">
+    This Whisper Page was set to destruct upon viewing by its creator.<br />
+    <span class="text-blue-900 font-semibold">
+      When you leave this page, the content will be gone forever.
+    </span>
+  </p>
+</div>
+
+{% endif %}
+
+<div class="container mx-auto px-4 mt-10">
+  <!-- Hidden textarea to store raw markdown -->
+  <textarea id="rawMarkdown" class="hidden">{{ whisper_content }}</textarea>
+
+  <!-- Display area for rendered markdown -->
+  <div
+    id="markdownPreview"
+    class="markdown-body resize-y w-full px-4 py-2 text-neutral-900 bg-white border mb-4"
+    style="min-height: 258px; list-style-type: disc"
+  >
+    <!-- Rendered markdown will appear here -->
+  </div>
+
+  <!-- Copy to Clipboard Button -->
+  <div class="flex justify-start mt-6">
+    <button
+      onclick="copyToClipboard()"
+      class="bg-blue-800 hover:bg-blue-700 px-8 py-3 rounded-md text-white font-bold transition ease-in-out duration-200 flex items-center shadow-md"
+    >
+      <i class="fas fa-copy mr-2"></i>
+      Copy Whisper Content
+    </button>
+
+    {% if destruct_upon_viewing == "0" %}
+    <!-- Container for Destroy Button -->
+    <!-- Form to Destroy Whisper Page -->
+    <form action="{{link}}destroy_whisper" method="post">
+      <button
+        type="submit"
+        class="ml-4 bg-red-800 hover:bg-red-700 px-8 py-3 rounded-md text-white font-bold transition ease-in-out duration-200 flex items-center shadow-md"
+        id="destroyWhisperButton"
+      >
+        <i class="fas fa-times mr-2"></i>
+        Destroy Whisper Page Now
+      </button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get raw markdown from the hidden textarea
+    const rawMarkdown = document.getElementById("rawMarkdown").value;
+
+    // Render the markdown using 'marked' and display it
+    const renderedMarkdown = marked(rawMarkdown);
+    document.getElementById("markdownPreview").innerHTML = renderedMarkdown;
+  });
+
+  function copyToClipboard() {
+    const el = document.createElement("textarea");
+    el.value = document.getElementById("rawMarkdown").value;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+  }
+</script>
+
+{% endblock content %}

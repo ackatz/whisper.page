@@ -1,0 +1,150 @@
+{% extends "base.html" %} {% block head %}
+<script
+  src="https://cdn.counter.dev/script.js"
+  data-id="bb924a97-31a1-4dfb-8076-3b1073b0ce8d"
+  data-utcoffset="-7"
+></script>
+{% endblock head %} {% block title %}
+<title>Whisper.Page | One-time links to your secret, note, or code block</title>
+{% endblock title %} {% block page_title %}
+<div class="justify-center items-center text-center text-4xl mb-6">
+  Whisper Pages are<br />
+  one-time links to your <br />
+  <span class="rotating-container">
+    <span
+      id="rotatingText"
+      class="text-6xl bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent"
+      >secret</span
+    >
+  </span>
+</div>
+
+{% endblock page_title %} {% block content %}
+<div class="container mx-auto px-4 mt-10">
+  <h1 class="text-2xl font-extrabold mb-6 text-neutral-700">
+    Create a Whisper Page
+  </h1>
+  <form action="/generate_link" method="POST">
+    <textarea
+      id="markdownInput"
+      maxlength="100000"
+      name="whisper_content"
+      placeholder="Enter your whisper, note, code block, or information here..."
+      rows="10"
+      class="resize-y w-full px-4 py-2 mb-4 rounded-md text-neutral-900 bg-white focus:outline-none focus:border-blue-500 border shadow-md"
+    ></textarea>
+    <div
+      id="markdownPreview"
+      class="markdown-body resize-y w-full px-4 py-2 rounded-md text-neutral-900 bg-white border mb-4 shadow-md hidden"
+      style="min-height: 258px; list-style-type: disc"
+    ></div>
+    <button
+      type="button"
+      class="mt-2 bg-neutral-500 hover:bg-neutral-600 px-4 py-3 rounded-md text-white font-bold transition ease-in-out duration-200 shadow-md"
+      id="toggleMarkdown"
+    >
+      <i class="fas fa-eye mr-2"></i>
+      <span id="toggleText">Preview Markdown</span>
+    </button>
+    <div class="mt-6">
+      <label for="ttl" class="block text-sm font-medium text-neutral-900 mb-2"
+        >Set Expiration:</label
+      >
+      <select
+        name="ttl"
+        id="ttl"
+        class="block w-full px-4 py-2 rounded-md text-neutral-900 bg-white focus:outline-none focus:border-blue-500 border shadow-md"
+      >
+        <option value="30">30 Minutes</option>
+        <option value="60">1 Hour</option>
+        <option value="360">6 Hours</option>
+        <option value="720">12 Hours</option>
+        <option value="1440">1 Day</option>
+        <option value="10080">1 Week</option>
+      </select>
+    </div>
+
+    <div class="flex items-center mt-6">
+      <input
+        id="destruct_upon_viewing"
+        type="checkbox"
+        name="destruct_upon_viewing"
+        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+      />
+      <label
+        for="destruct_upon_viewing"
+        class="ml-2 text-sm font-medium text-neutral-900"
+        >Destruct upon viewing (Mission Impossible mode)</label
+      >
+    </div>
+
+    <div class="flex justify-start mt-6">
+      <button
+        type="submit"
+        class="bg-blue-800 hover:bg-blue-700 px-8 py-3 rounded-md text-white font-bold transition ease-in-out duration-200 flex items-center shadow-md"
+      >
+        <i class="fas fa-link mr-2"></i>
+        Generate Sharable Link
+      </button>
+      <button
+        type="button"
+        class="ml-4 bg-red-800 hover:bg-red-700 px-8 py-3 rounded-md text-white font-bold transition ease-in-out duration-200 flex items-center shadow-md"
+        id="clearTextButton"
+      >
+        <i class="fas fa-times mr-2"></i>
+        Clear Text
+      </button>
+    </div>
+  </form>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const rotatingTexts = ["note", "code block", "memo", "secret"];
+    let rotatingTextIndex = 0;
+    const rotatingTextElement = document.getElementById("rotatingText");
+
+    setInterval(function () {
+      rotatingTextElement.classList.remove("fade-in");
+      rotatingTextElement.classList.add("fade-out");
+
+      setTimeout(function () {
+        rotatingTextIndex = (rotatingTextIndex + 1) % rotatingTexts.length;
+        rotatingTextElement.textContent = rotatingTexts[rotatingTextIndex];
+        rotatingTextElement.classList.remove("fade-out");
+        rotatingTextElement.classList.add("fade-in");
+      }, 700); // Matches the duration of the fadeOut animation
+    }, 7000);
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Clear button logic
+    const clearButton = document.getElementById("clearTextButton");
+    const textarea = document.querySelector("textarea[name='whisper_content']");
+
+    clearButton.addEventListener("click", function () {
+      textarea.value = ""; // Clears the content of the textarea
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .getElementById("toggleMarkdown")
+      .addEventListener("click", function () {
+        const input = document.getElementById("markdownInput");
+        const preview = document.getElementById("markdownPreview");
+        const toggleText = document.getElementById("toggleText"); // Get the span element
+        if (preview.classList.contains("hidden")) {
+          preview.innerHTML = marked(input.value);
+          preview.classList.remove("hidden");
+          input.classList.add("hidden");
+          toggleText.textContent = "Edit Markdown"; // Modify only the span's content
+        } else {
+          preview.classList.add("hidden");
+          input.classList.remove("hidden");
+          toggleText.textContent = "Preview Markdown"; // Modify only the span's content
+        }
+      });
+  });
+</script>
+
+{% endblock content %}

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <style>
+      .rotating-container {
+        width: 82px;
+        overflow: hidden;
+        align-items: center;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s forwards;
+      }
+
+      .fade-out {
+        animation: fadeOut 0.5s forwards;
+      }
+
+      #markdownPreview ul {
+        list-style-type: disc !important;
+      }
+
+      #markdownPreview li {
+        list-style-type: disc !important;
+        margin-left: 20px !important;
+      }
+    </style>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="{% block viewport %}width=device-width, initial-scale=1.0{% endblock viewport %}"
+    />
+    <!-- Meta Image -->
+    <meta
+      name="image"
+      property="og:image"
+      content="{% block og_image %}/app/static/logo.png{% endblock og_image %}"
+    />
+
+    <!-- Meta Description -->
+    <meta
+      name="description"
+      content="{% block meta_description %}Whisper Pages are secure and anonymous webpages for sharing secrets, code blocks, and other information with someone you trust.{% endblock meta_description %}"
+    />
+
+    <!-- Meta Keywords -->
+    <meta
+      name="keywords"
+      content="{% block meta_keywords %}secret, sharing, cybersecurity, security, share, code{% endblock meta_keywords %}"
+    />
+
+    <!-- Author Meta -->
+    <meta
+      name="author"
+      content="{% block meta_author %}Whisper.Page{% endblock meta_author %}"
+    />
+
+    <!-- Canonical URL -->
+    <link
+      rel="canonical"
+      href="{% block canonical_url %}https://whisper.page{% endblock canonical_url %}"
+    />
+
+    <!-- Open Graph Tags for Facebook and LinkedIn -->
+    <meta
+      property="og:title"
+      content="{% block og_title %}Whisper.Page | Share a secret with someone you trust{% endblock og_title %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_description %}Whisper Pages are secure, one-time links to your secret, note, memo, and more! Share it with someone you trust.{% endblock og_description %}"
+    />
+    <meta
+      property="og:type"
+      content="{% block og_type %}website{% endblock og_type %}"
+    />
+    <meta
+      property="og:url"
+      content="{% block og_url %}https://whisper.page{% endblock og_url %}"
+    />
+    <meta
+      property="og:site_name"
+      content="{% block og_site_name %}Whisper.Page{% endblock og_site_name %}"
+    />
+
+    <!-- Twitter Card Tags -->
+    <meta
+      name="twitter:card"
+      content="{% block twitter_card %}summary{% endblock twitter_card %}"
+    />
+    <meta
+      name="twitter:title"
+      content="{% block twitter_title %}Whisper Pages are secure, one-time links to your secret, note, memo, and more! Share it with someone you trust.{% endblock twitter_title %}"
+    />
+    <meta
+      name="twitter:description"
+      content="{% block twitter_description %}Whisper Pages are secure, one-time links to your secret, note, memo, and more! Share it with someone you trust.{% endblock twitter_description %}"
+    />
+
+    {% block title %}
+    <title>Whisper.Page | Share a secret with someone you trust</title>
+    {% endblock title %}
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css"
+    />
+    <style>
+      body.sidebar-open {
+        overflow: hidden;
+      }
+      #sidebar {
+        transition: transform 0.3s ease-in-out;
+        width: 75%;
+        max-width: 300px;
+      }
+      body.sidebar-open #sidebar {
+        transform: translateX(0);
+      }
+      html {
+        overflow-y: scroll;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
+    {% block head %}{% endblock head %}
+  </head>
+
+  <body class="bg-neutral-50 text-neutral-900">
+    <!-- Navigation bar -->
+    {% block navbar %}
+    <nav class="bg-gradient-to-r from-blue-800 to-blue-900 shadow py-6">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+          <!-- Name -->
+          <a
+            href="/"
+            class="flex items-center text-2xl font-bold text-white hover:text-blue-200"
+          >
+            Whisper<span class="text-blue-200">.</span>Page
+          </a>
+          <!-- Hamburger Icon for Mobile -->
+          <button id="navToggle" class="text-white text-2xl md:hidden">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <!-- Sidebar for Mobile -->
+          <nav
+            id="sidebar"
+            class="bg-neutral-100 shadow fixed inset-y-0 left-0 transform -translate-x-full md:hidden ease-in-out transition-all duration-300 z-30"
+          >
+            <div class="p-4">
+              <!-- Name -->
+              <a
+                href="/"
+                class="flex items-center text-2xl font-bold text-neutral-900 hover:text-blue-200 mb-2"
+              >
+                Whisper<span class="text-blue-200">.</span>Page
+              </a>
+
+              <a href="/" class="block font-bold hover:text-blue-800 mb-2"
+                >Home</a
+              >
+              <a
+                href="https://github.com/ackatz/whisper.page"
+                target="_blank"
+                class="block font-bold hover:text-blue-800 mb-2"
+                >Source Code</a
+              >
+              <a
+                href="/security"
+                class="block font-bold hover:text-blue-800 mb-2"
+                >Security</a
+              >
+              <a
+                href="/privacy"
+                class="block font-bold hover:text-blue-800 mb-2"
+                >Privacy</a
+              >
+              <a
+                href="/contact"
+                class="block font-bold hover:text-blue-800 mb-2"
+                >Contact</a
+              >
+            </div>
+          </nav>
+
+          <!-- Navigation links -->
+          <div id="menu" class="hidden md:flex space-x-8">
+            <a href="/" class="font-bold text-white hover:text-blue-200"
+              >Home</a
+            >
+            <a
+              href="https://github.com/ackatz/whisper.page"
+              target="_blank"
+              class="font-bold text-white hover:text-blue-200"
+              >Source Code</a
+            >
+            <a href="/security" class="font-bold text-white hover:text-blue-200"
+              >Security</a
+            >
+            <a href="/privacy" class="font-bold text-white hover:text-blue-200"
+              >Privacy</a
+            >
+            <a href="/contact" class="font-bold text-white hover:text-blue-200"
+              >Contact</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+    {% endblock navbar %}
+
+    <div class="text-center mt-12 mb-12">
+      <h1 class="text-2xl font-extrabold mb-4 text-neutral-700">
+        {% block page_title %}Base{% endblock page_title %}
+      </h1>
+    </div>
+    {% block content %} {% endblock content %}
+
+    <!-- Back to Top Button -->
+    <div class="flex justify-center mb-4">
+      <button
+        id="backToTop"
+        class="back-to-top hidden text-neutral-900 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Back to Top
+      </button>
+    </div>
+
+    {% block footer %}
+    <footer>
+      <div
+        class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between"
+      >
+        <span
+          class="text-sm text-neutral-500 sm:text-center dark:text-neutral-400"
+          >© 2023
+          <a href="https://whisper.page" class="hover:underline">Whisper.Page</a
+          >. All Rights Reserved.
+        </span>
+        <ul class="flex flex-wrap items-center text-neutral-900 sm:mt-0">
+          <li>
+            <a
+              href="/"
+              class="mr-4 md:mr-6 font-bold text-neutral-900 hover:text-blue-800 mb-2"
+              >Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="/security"
+              class="mr-4 md:mr-6 font-bold text-neutral-900 hover:text-blue-800 mb-2"
+              >Security</a
+            >
+          </li>
+          <li>
+            <a
+              href="/privacy"
+              class="mr-4 md:mr-6 font-bold text-neutral-900 hover:text-blue-800 mb-2"
+              >Privacy</a
+            >
+          </li>
+
+          <li>
+            <a
+              href="/contact"
+              class="mr-4 md:mr-6 font-bold text-neutral-900 hover:text-blue-800 mb-2"
+              >Contact</a
+            >
+          </li>
+        </ul>
+      </div>
+    </footer>
+    {% endblock footer %}
+
+    <script>
+      document
+        .getElementById("navToggle")
+        .addEventListener("click", function () {
+          document.body.classList.toggle("sidebar-open");
+        });
+
+      document.addEventListener("click", function (event) {
+        var isClickInsideSidebar = document
+          .getElementById("sidebar")
+          .contains(event.target);
+        var isClickOnToggle = document
+          .getElementById("navToggle")
+          .contains(event.target);
+
+        if (
+          !isClickInsideSidebar &&
+          !isClickOnToggle &&
+          document.body.classList.contains("sidebar-open")
+        ) {
+          document.body.classList.remove("sidebar-open");
+        }
+      });
+    </script>
+    <script>
+      var backToTopButton = document.getElementById("backToTop");
+
+      window.addEventListener("scroll", function () {
+        if (window.scrollY > 300) {
+          // Show backToTopButton after scrolling down 300px
+          backToTopButton.classList.remove("hidden");
+        } else {
+          backToTopButton.classList.add("hidden");
+        }
+      });
+
+      backToTopButton.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" }); // Smooth scroll to top
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+{% extends "base.html" %} {% block title %}
+<title>Whisper.Page | Your Whisper Page Link</title>
+{% endblock title %} {% block page_title %}Your Whisper Page Link {% endblock
+page_title %} {% block content %}
+<div class="container mx-auto text-center">
+  {% if link %}
+  <div class="mb-6 max-w-2xl mx-auto">
+    <div
+      class="overflow-hidden relative group bg-gray-50 p-4 rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300"
+    >
+      <a
+        href="https://whisper.page{{ link }}/"
+        class="text-gray-700 truncate hover:text-blue-500 group-hover:text-blue-400"
+        target="_blank"
+      >
+        https://whisper.page{{ link }}/
+      </a>
+      <button
+        onclick="copyToClipboard()"
+        class="absolute inset-y-0 right-0 px-8 py-2 bg-blue-800 hover:bg-blue-700 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all duration-200"
+      >
+        <i class="fas fa-copy text-white"></i>
+      </button>
+    </div>
+
+    {% if ttl_date %}
+    <div class="container mx-auto mt-6 text-center mb-6">
+      <p class="text-neutral-900 mb-6">
+        This Whisper Page will automatically expire on:<br />
+        <span class="text-blue-900 font-semibold"
+          >{{ ttl_date }} UTC {% if ttl_minutes < 60 %} ({{ ttl_minutes }}
+          minutes from now) {% else %} ({{ (ttl_minutes / 60)|round }} hours
+          from now) {% endif %}
+        </span>
+      </p>
+    </div>
+    {% endif %}
+
+    <p class="text-neutral-900 font-bold mt-6">
+      Keep it secret... Keep it safe.
+    </p>
+  </div>
+
+  <script>
+    function copyToClipboard() {
+      const el = document.createElement("textarea");
+      el.value = "https://whisper.page{{ link }}/";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+  </script>
+  {% else %}
+  <div class="mt-6 text-red-500">No link generated.</div>
+  {% endif %}
+</div>
+{% endblock content %}

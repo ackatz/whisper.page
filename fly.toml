@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for whisperpage on 2023-10-31T17:17:16-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "whisperpage"
+primary_region = "den"
+
+[build]
+
+[[mounts]]
+  source = "litefs"
+  destination = "/var/lib/litefs"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 2200
+    soft_limit = 2000

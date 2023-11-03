@@ -1,0 +1,1 @@
+* * * * * /usr/local/bin/python3 /app/dbo/whisper_manager.py >> /app/log/whisper_manager.log 2>&1
