@@ -25,7 +25,11 @@ master_key = base64.b64decode(master_key_str)
 @app.middleware("http")
 async def custom_http_middleware(request: Request, call_next):
     response = await call_next(request)
-
+    response.headers[
+        "Strict-Transport-Security"
+    ] = "max-age=31536000; includeSubDomains"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "no-referrer"
     csp_header = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.counter.dev; "
