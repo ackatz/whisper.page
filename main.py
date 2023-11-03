@@ -12,6 +12,7 @@ from functions import date_functions
 import os
 import base64
 
+
 app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
 
 templates = Jinja2Templates(directory="/app/templates")
@@ -24,6 +25,14 @@ master_key = base64.b64decode(master_key_str)
 @app.middleware("http")
 async def custom_http_middleware(request: Request, call_next):
     response = await call_next(request)
+
+    # Add security headers
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers[
+        "Content-Security-Policy"
+    ] = "default-src 'self'; script-src 'self'; object-src 'none';"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
     if response.status_code in (404, 405):
         return templates.TemplateResponse(
             "404.html", {"request": request}, status_code=404
@@ -32,6 +41,7 @@ async def custom_http_middleware(request: Request, call_next):
         return templates.TemplateResponse(
             "500.html", {"request": request}, status_code=500
         )
+
     return response
 
 
