@@ -30,7 +30,7 @@ async def custom_http_middleware(request: Request, call_next):
     csp_header = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.counter.dev;"
-        "connect-src 'self' https://cdn.jsdelivr.net https://cdn.counter.dev; "
+        "connect-src 'self' https://cdn.jsdelivr.net https://cdn.counter.dev https://t.counter.dev/; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "img-src 'self' https://whisper.page data:; "
         "font-src 'self' https://cdnjs.cloudflare.com; "
